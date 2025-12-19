@@ -1,0 +1,85 @@
+<!--index.wxml - 首页-->
+<navigation-bar title="ConflictAI" back="{{false}}" color="black" background="#FFF"></navigation-bar>
+
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 标题区域 -->
+    <view class="header">
+      <image class="logo" src="cloud://zyqconflict-8gmkka6ge2b61709.7a79-zyqconflict-8gmkka6ge2b61709-1391500022/logotitle.png" mode="aspectFit"></image>
+      <text class="title">人机交互实验</text>
+      <text class="subtitle">选择一个AI模型并输入聊天室代码，与智能调解专家展开对话</text>  
+    </view>
+
+    <!-- 聊天室代码栏 -->
+    <view class="section">
+      <view class="section-label">聊天室代码</view>
+      <view class="code-input-wrapper">
+        <input 
+          class="code-input" 
+          type="text" 
+          value="{{roomCode}}" 
+          placeholder="CHAT-xxx"
+          bindinput="onCodeInput"
+          maxlength="8"
+        />
+        <view class="refresh-btn" bindtap="refreshCode">
+          <text class="refresh-icon">🔄</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI模型选项栏 -->
+    <view class="section">
+      <view class="section-label">选择您要交互的AI模型</view>
+      <view class="model-options">
+        <view 
+          class="model-option {{selectedModel === 'narrative' ? 'active' : ''}}"
+          data-model="narrative"
+          bindtap="selectModel"
+        >
+          <text class="model-text">叙事型说服者</text>
+        </view>
+        <view 
+          class="model-option {{selectedModel === 'argumentative' ? 'active' : ''}}"
+          data-model="argumentative"
+          bindtap="selectModel"
+        >
+          <text class="model-text">论证型说服者</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 用户身份选择栏 -->
+    <view class="section">
+      <view class="section-label">请选择您的身份</view>
+      <view class="model-options">
+        <view 
+          class="model-option {{userRole === 'parent' ? 'active' : ''}}"
+          data-role="parent"
+          bindtap="selectUserRole"
+        >
+          <text class="model-text">家长</text>
+        </view>
+        <view 
+          class="model-option {{userRole === 'child' ? 'active' : ''}}"
+          data-role="child"
+          bindtap="selectUserRole"
+        >
+          <text class="model-text">孩子</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进入聊天室按钮 -->
+    <view class="section">
+      <button 
+        class="enter-btn {{loading ? 'loading' : ''}}"
+        bindtap="enterChatRoom"
+        disabled="{{loading}}"
+      >
+        <text wx:if="{{!loading}}">进入聊天室</text>
+        <text wx:else>加载中...</text>
+      </button>
+    </view>
+  </view>
+</scroll-view>

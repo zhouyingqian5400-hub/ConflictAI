@@ -1,0 +1,102 @@
+<!--chat.wxml - 聊天室页面-->
+<navigation-bar title="聊天室" back="{{true}}" color="black" background="#FFF" bindback="goBack"></navigation-bar>
+
+<view class="chat-container">
+  <!-- 头部信息 -->
+  <view class="chat-header">
+    <view class="header-info">
+      <text class="room-code">聊天室：{{roomCode}}</text>
+      <text class="model-tag">{{modelName}}</text>
+    </view>
+    <view class="header-actions">
+      <view class="prompt-btn" bindtap="togglePromptModal">
+        <text>查看提示词</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 等待状态提示 -->
+  <view wx:if="{{!canSendMessage && waitingText}}" class="waiting-banner">
+    <text class="waiting-text">{{waitingText}}</text>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view 
+    class="messages-container" 
+    scroll-y 
+    type="list"
+    scroll-into-view="{{scrollIntoView}}"
+  >
+    <view class="messages-list">
+      <!-- 空状态 -->
+      <view wx:if="{{messages.length === 0}}" class="empty-state">
+        <text class="empty-text">开始对话，AI会基于双方观点回应</text>
+      </view>
+
+      <!-- 消息项 -->
+      <view 
+        wx:for="{{messages}}" 
+        wx:key="id" 
+        wx:for-index="idx"
+        class="message-item {{item.role === 'user' ? 'user-message' : 'ai-message'}}"
+        id="msg-{{idx}}"
+      >
+          <view class="message-bubble {{item.isError ? 'error' : ''}}">
+            <view class="message-content-wrapper">
+              <view class="message-content" selectable="{{true}}">{{item.content}}</view>
+              <text class="copy-btn" data-content="{{item.content}}" bindtap="copyMessage">复制</text>
+            </view>
+          </view>
+        <text class="message-time" wx:if="{{item.timeText}}">{{item.timeText}}</text>
+      </view>
+
+      <!-- AI思考中 -->
+      <view wx:if="{{aiThinking}}" class="message-item ai-message">
+        <view class="message-bubble thinking">
+          <text class="message-content">AI 正在思考...</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区 -->
+  <view class="input-container">
+    <view class="input-wrapper">
+      <textarea 
+        class="input-textarea"
+        value="{{inputText}}"
+        placeholder="{{canSendMessage ? '输入消息...' : '等待其他用户加入...'}}"
+        bindinput="onInput"
+        bindconfirm="onConfirm"
+        bindlinechange="onLineChange"
+        confirm-type="send"
+        maxlength="250"
+        auto-height="{{true}}"
+        show-confirm-bar="{{false}}"
+        disabled="{{loading || aiThinking || !canSendMessage}}"
+        hold-keyboard="{{true}}"
+      ></textarea>
+      <button 
+        class="send-btn {{(loading || aiThinking || !inputText.trim() || !canSendMessage) ? 'disabled' : ''}}"
+        bindtap="sendMessage"
+        disabled="{{loading || aiThinking || !inputText.trim() || !canSendMessage}}"
+      >
+        <text wx:if="{{!loading && !aiThinking}}">发送</text>
+        <text wx:else>...</text>
+      </button>
+    </view>
+  </view>
+</view>
+
+<!-- Prompt弹窗 -->
+<view wx:if="{{showPromptModal}}" class="modal-overlay" bindtap="closePromptModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">当前模型提示词</text>
+      <text class="modal-close" bindtap="closePromptModal">×</text>
+    </view>
+    <scroll-view class="modal-body" scroll-y>
+      <text class="prompt-text">{{promptText}}</text>
+    </scroll-view>
+  </view>
+</view>
